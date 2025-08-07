@@ -19,6 +19,14 @@ export default {
     manualTheme: '手動切換',
     language: '語言設定',
     languageDesc: '切換顯示語言',
+    tokenManagement: 'Cookie管理',
+    tokenManagementDesc: '管理網易雲音樂登入Cookie',
+    tokenStatus: '目前Cookie狀態',
+    tokenSet: '已設定',
+    tokenNotSet: '未設定',
+    setCookie: '設定Cookie',
+    modifyToken: '修改Cookie',
+    clearToken: '清除Cookie',
     font: '字體設定',
     fontDesc: '選擇字體，優先使用排在前面的字體',
     fontScope: {
@@ -70,7 +78,7 @@ export default {
     autoPlay: '自動播放',
     autoPlayDesc: '重新開啟應用程式時是否自動繼續播放',
     showStatusBar: '是否顯示狀態列控制功能',
-    showStatusBarContent: '可以在您的mac狀態列顯示音樂控制功能(重啟後生效)',
+    showStatusBarContent: '可以在您的mac狀態列顯示音樂控制功能(重啟後生效)'
   },
   application: {
     closeAction: '關閉行為',
@@ -183,6 +191,7 @@ export default {
     hideLyrics: '隱藏歌詞',
     hidePlayBar: '隱藏播放列',
     hideMiniPlayBar: '隱藏迷你播放列',
+    showMiniPlayBar: '顯示迷你播放列',
     backgroundTheme: '背景主題',
     themeOptions: {
       default: '預設',
@@ -212,14 +221,42 @@ export default {
       'spotify-green': 'Spotify 綠',
       'apple-blue': '蘋果藍',
       'youtube-red': 'YouTube 紅',
-      'orange': '活力橙',
-      'purple': '神秘紫',
-      'pink': '櫻花粉'
+      orange: '活力橙',
+      purple: '神秘紫',
+      pink: '櫻花粉'
     },
     tooltips: {
       openColorPicker: '開啟色板',
       closeColorPicker: '關閉色板'
     },
     placeholder: '#1db954'
+  },
+  cookie: {
+    title: 'Cookie設定',
+    description: '請輸入網易雲音樂的Cookie：',
+    placeholder: '請貼上完整的Cookie...',
+    help: {
+      format: 'Cookie通常以 "MUSIC_U=" 開頭',
+      source: '可以從瀏覽器開發者工具的網路請求中取得',
+      storage: 'Cookie設定後將自動儲存到本機儲存'
+    },
+    action: {
+      save: '儲存Cookie',
+      paste: '貼上',
+      clear: '清空'
+    },
+    validation: {
+      required: '請輸入Cookie',
+      format: 'Cookie格式可能不正確，請檢查是否包含MUSIC_U'
+    },
+    message: {
+      saveSuccess: 'Cookie儲存成功',
+      saveError: 'Cookie儲存失敗',
+      pasteSuccess: '貼上成功',
+      pasteError: '貼上失敗，請手動複製'
+    },
+    info: {
+      length: '目前長度：{length} 字元'
+    }
   }
 };

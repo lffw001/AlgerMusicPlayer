@@ -58,11 +58,9 @@
     <div class="music-content">
       <div class="music-content-title flex items-center">
         <n-ellipsis class="text-ellipsis" line-clamp="1">
-          {{ playMusic.name }}
+          {{ playMusic?.name || '' }}
         </n-ellipsis>
-        <span v-if="playbackRate !== 1.0" class="playback-rate-badge">
-            {{ playbackRate }}x
-        </span>
+        <span v-if="playbackRate !== 1.0" class="playback-rate-badge"> {{ playbackRate }}x </span>
       </div>
       <div class="music-content-name">
         <n-ellipsis
@@ -125,25 +123,28 @@
         <template #trigger>
           <i
             class="iconfont ri-netease-cloud-music-line"
-            :class="{ 'text-green-500': isLyricWindowOpen, 'disabled-icon': !playMusic.id }"
-            @click="playMusic.id && openLyricWindow()"
+            :class="{ 'text-green-500': isLyricWindowOpen, 'disabled-icon': !playMusic?.id }"
+            @click="playMusic?.id && openLyricWindow()"
           ></i>
         </template>
-        {{ playMusic.id ? t('player.playBar.lyric') : t('player.playBar.noSongPlaying') }}
+        {{ playMusic?.id ? t('player.playBar.lyric') : t('player.playBar.noSongPlaying') }}
       </n-tooltip>
-      <n-tooltip v-if="playMusic.id && isElectron" trigger="hover" :z-index="9999999">
+      <n-tooltip v-if="playMusic?.id && isElectron" trigger="hover" :z-index="9999999">
         <template #trigger>
-          <reparse-popover v-if="playMusic.id" />
+          <reparse-popover v-if="playMusic?.id" />
         </template>
         {{ t('player.playBar.reparse') }}
       </n-tooltip>
-      
+
       <!-- 高级控制菜单按钮（整合了 EQ、定时关闭、播放速度） -->
       <advanced-controls-popover />
-      
+
       <n-tooltip trigger="hover" :z-index="9999999">
         <template #trigger>
-          <i class="iconfont icon-list text-2xl hover:text-green-500 transition-colors cursor-pointer" @click="openPlayListDrawer"></i>
+          <i
+            class="iconfont icon-list text-2xl hover:text-green-500 transition-colors cursor-pointer"
+            @click="openPlayListDrawer"
+          ></i>
         </template>
         {{ t('player.playBar.playList') }}
       </n-tooltip>
@@ -156,8 +157,12 @@
 <script lang="ts" setup>
 import { useThrottleFn } from '@vueuse/core';
 import { useMessage } from 'naive-ui';
+import { storeToRefs } from 'pinia';
 import { computed, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
+
+import MusicFullWrapper from '@/components/lyric/MusicFullWrapper.vue';
+import AdvancedControlsPopover from '@/components/player/AdvancedControlsPopover.vue';
 import ReparsePopover from '@/components/player/ReparsePopover.vue';
 import {
   allTime,
@@ -169,16 +174,10 @@ import {
   textColors
 } from '@/hooks/MusicHook';
 import { useArtist } from '@/hooks/useArtist';
-import MusicFullWrapper from '@/components/lyric/MusicFullWrapper.vue';
 import { audioService } from '@/services/audioService';
-import { 
-  isBilibiliIdMatch, 
-  usePlayerStore
-} from '@/store/modules/player';
+import { isBilibiliIdMatch, usePlayerStore } from '@/store/modules/player';
 import { useSettingsStore } from '@/store/modules/settings';
 import { getImgUrl, isElectron, isMobile, secondToMinute, setAnimationClass } from '@/utils';
-import AdvancedControlsPopover from '@/components/player/AdvancedControlsPopover.vue';
-import { storeToRefs } from 'pinia';
 
 const playerStore = usePlayerStore();
 const settingsStore = useSettingsStore();
@@ -192,7 +191,9 @@ const background = ref('#000');
 watch(
   () => playerStore.playMusic,
   async () => {
-    background.value = playMusic.value.backgroundColor as string;
+    if (playMusic && playMusic.value && playMusic.value.backgroundColor) {
+      background.value = playMusic.value.backgroundColor as string;
+    }
   },
   { immediate: true, deep: true }
 );
@@ -244,27 +245,22 @@ const formatTooltip = (value: number) => {
   return `${secondToMinute(value)} / ${secondToMinute(allTime.value)}`;
 };
 
-// 音量条
-const audioVolume = ref(
-  localStorage.getItem('volume') ? parseFloat(localStorage.getItem('volume') as string) : 1
-);
+// 音量条 - 使用 playerStore 的统一音量管理
 const getVolumeIcon = computed(() => {
   // 0 静音 ri-volume-mute-line 0.5 ri-volume-down-line 1 ri-volume-up-line
-  if (audioVolume.value === 0) {
+  if (playerStore.volume === 0) {
     return 'ri-volume-mute-line';
   }
-  if (audioVolume.value <= 0.5) {
+  if (playerStore.volume <= 0.5) {
     return 'ri-volume-down-line';
   }
   return 'ri-volume-up-line';
 });
 
 const volumeSlider = computed({
-  get: () => audioVolume.value * 100,
+  get: () => playerStore.volume * 100,
   set: (value) => {
-    localStorage.setItem('volume', (value / 100).toString());
-    audioService.setVolume(value / 100);
-    audioVolume.value = value / 100;
+    playerStore.setVolume(value / 100);
   }
 });
 
@@ -313,7 +309,7 @@ const playModeText = computed(() => {
 });
 
 // 播放速度控制
-const {playbackRate} = storeToRefs(playerStore);
+const { playbackRate } = storeToRefs(playerStore);
 // 切换播放模式
 const togglePlayMode = () => {
   playerStore.togglePlayMode();
@@ -333,7 +329,7 @@ const showSliderTooltip = ref(false);
 // 播放暂停按钮事件
 const playMusicEvent = async () => {
   try {
-    const result = await playerStore.setPlay({ ...playMusic.value});
+    const result = await playerStore.setPlay({ ...playMusic.value });
     if (result) {
       playerStore.setPlayMusic(true);
     }
@@ -348,7 +344,7 @@ const musicFullVisible = computed({
   set: (value) => {
     playerStore.setMusicFull(value);
   }
-})
+});
 
 // 设置musicFull
 const setMusicFull = () => {
@@ -360,11 +356,12 @@ const setMusicFull = () => {
 };
 
 const isFavorite = computed(() => {
+  if (!playMusic || !playMusic.value) return false;
   // 对于B站视频，使用ID匹配函数
   if (playMusic.value.source === 'bilibili' && playMusic.value.bilibiliData?.bvid) {
-    return playerStore.favoriteList.some(id => isBilibiliIdMatch(id, playMusic.value.id));
+    return playerStore.favoriteList.some((id) => isBilibiliIdMatch(id, playMusic.value.id));
   }
-  
+
   // 非B站视频直接比较ID
   return playerStore.favoriteList.includes(playMusic.value.id);
 });
@@ -372,7 +369,7 @@ const isFavorite = computed(() => {
 const toggleFavorite = async (e: Event) => {
   console.log('playMusic.value', playMusic.value);
   e.stopPropagation();
-  
+
   // 处理B站视频的收藏ID
   let favoriteId = playMusic.value.id;
   if (playMusic.value.source === 'bilibili' && playMusic.value.bilibiliData?.bvid) {
@@ -381,7 +378,7 @@ const toggleFavorite = async (e: Event) => {
       favoriteId = `${playMusic.value.bilibiliData.bvid}--${playMusic.value.song?.ar?.[0]?.id || 0}--${playMusic.value.bilibiliData.cid}`;
     }
   }
-  
+
   if (isFavorite.value) {
     playerStore.removeFromFavorite(favoriteId);
   } else {
@@ -490,7 +487,7 @@ const openPlayListDrawer = () => {
     @apply absolute opacity-0 invisible transition-all duration-300 bottom-[30px] left-1/2 -translate-x-1/2 h-[180px] px-2 py-4 rounded-xl;
     @apply bg-light dark:bg-dark-200;
     @apply border border-gray-200 dark:border-gray-700;
-    
+
     .volume-percentage {
       @apply absolute -top-6 left-1/2 -translate-x-1/2 text-xs font-medium bg-light dark:bg-dark-200 px-2 py-1 rounded-md;
       @apply border border-gray-200 dark:border-gray-700;
@@ -727,7 +724,6 @@ const openPlayListDrawer = () => {
 .speed-button:hover {
   background: var(--hover-color-dark);
 }
-
 
 .playback-rate-badge {
   @apply ml-2 px-1.5 h-4 flex items-center text-xs rounded bg-green-500 bg-opacity-15 text-green-600 dark:text-green-400;

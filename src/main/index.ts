@@ -8,20 +8,19 @@ import { loadLyricWindow } from './lyric';
 import { initializeConfig } from './modules/config';
 import { initializeFileManager } from './modules/fileManager';
 import { initializeFonts } from './modules/fonts';
+import { initializeLoginWindow } from './modules/loginWindow';
 import { initializeRemoteControl } from './modules/remoteControl';
 import { initializeShortcuts, registerShortcuts } from './modules/shortcuts';
 import { initializeTray, updateCurrentSong, updatePlayState, updateTrayMenu } from './modules/tray';
 import { setupUpdateHandlers } from './modules/update';
 import { createMainWindow, initializeWindowManager, setAppQuitting } from './modules/window';
-import { startMusicApi } from './server';
 import { initWindowSizeManager } from './modules/window-size';
+import { startMusicApi } from './server';
 
 // 导入所有图标
 const iconPath = join(__dirname, '../../resources');
 const icon = nativeImage.createFromPath(
-  process.platform === 'darwin'
-    ? join(iconPath, 'icon.icns')
-    : join(iconPath, 'icon.png')
+  process.platform === 'darwin' ? join(iconPath, 'icon.icns') : join(iconPath, 'icon.png')
 );
 
 let mainWindow: Electron.BrowserWindow;
@@ -43,6 +42,8 @@ function initialize() {
   initializeWindowManager();
   // 初始化字体管理
   initializeFonts();
+  // 初始化登录窗口
+  initializeLoginWindow();
 
   // 创建主窗口
   mainWindow = createMainWindow(icon);

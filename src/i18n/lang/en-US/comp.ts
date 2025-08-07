@@ -60,7 +60,7 @@ export default {
     wechatQR: 'Wechat QR code',
     coffeeDesc: 'A cup of coffee, a support',
     coffeeDescLinkText: 'View more',
-    qqGroup: 'QQ group: algermusic',
+    groupText: 'Wechat Public Account: AlgerMusic',
     messages: {
       copySuccess: 'Copied to clipboard'
     },
@@ -174,7 +174,8 @@ export default {
       noTasks: 'No import tasks',
       clearTasks: 'Clear Tasks',
       clearTasksConfirmTitle: 'Confirm Clear',
-      clearTasksConfirmContent: 'Are you sure you want to clear all import task records? This action cannot be undone.',
+      clearTasksConfirmContent:
+        'Are you sure you want to clear all import task records? This action cannot be undone.',
       confirm: 'Confirm',
       cancel: 'Cancel',
       clearTasksSuccess: 'Task list cleared',

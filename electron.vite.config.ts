@@ -18,7 +18,8 @@ export default defineConfig({
     resolve: {
       alias: {
         '@': resolve('src/renderer'),
-        '@renderer': resolve('src/renderer')
+        '@renderer': resolve('src/renderer'),
+        '@i18n': resolve('src/i18n')
       }
     },
     plugins: [
@@ -39,7 +40,7 @@ export default defineConfig({
     ],
     publicDir: resolve('resources'),
     server: {
-      host: '0.0.0.0',
+      host: '0.0.0.0'
     }
   }
 });

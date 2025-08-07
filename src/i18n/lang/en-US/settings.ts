@@ -19,6 +19,14 @@ export default {
     manualTheme: 'Manual Switch',
     language: 'Language Settings',
     languageDesc: 'Change display language',
+    tokenManagement: 'Cookie Management',
+    tokenManagementDesc: 'Manage NetEase Cloud Music login Cookie',
+    tokenStatus: 'Current Cookie Status',
+    tokenSet: 'Set',
+    tokenNotSet: 'Not Set',
+    setToken: 'Set Cookie',
+    modifyToken: 'Modify Cookie',
+    clearToken: 'Clear Cookie',
     font: 'Font Settings',
     fontDesc: 'Select fonts, prioritize fonts in order',
     fontScope: {
@@ -66,11 +74,13 @@ export default {
     configureMusicSources: 'Configure Sources',
     selectedMusicSources: 'Selected sources:',
     noMusicSources: 'No sources selected',
-    gdmusicInfo: 'GD Music Station intelligently resolves music from multiple platforms automatically',
+    gdmusicInfo:
+      'GD Music Station intelligently resolves music from multiple platforms automatically',
     autoPlay: 'Auto Play',
     autoPlayDesc: 'Auto resume playback when reopening the app',
-    showStatusBar: "Show Status Bar",
-    showStatusBarContent: "You can display the music control function in your mac status bar (effective after a restart)"
+    showStatusBar: 'Show Status Bar',
+    showStatusBarContent:
+      'You can display the music control function in your mac status bar (effective after a restart)'
   },
   application: {
     closeAction: 'Close Action',
@@ -183,6 +193,7 @@ export default {
     hideLyrics: 'Hide Lyrics',
     hidePlayBar: 'Hide Play Bar',
     hideMiniPlayBar: 'Hide Mini Play Bar',
+    showMiniPlayBar: 'Show Mini Play Bar',
     backgroundTheme: 'Background Theme',
     themeOptions: {
       default: 'Default',
@@ -232,9 +243,9 @@ export default {
       'spotify-green': 'Spotify Green',
       'apple-blue': 'Apple Blue',
       'youtube-red': 'YouTube Red',
-      'orange': 'Vibrant Orange',
-      'purple': 'Mystic Purple',
-      'pink': 'Cherry Pink'
+      orange: 'Vibrant Orange',
+      purple: 'Mystic Purple',
+      pink: 'Cherry Pink'
     },
     tooltips: {
       openColorPicker: 'Open Color Picker',
@@ -280,6 +291,34 @@ export default {
     addIp: 'Add IP',
     emptyListHint: 'Empty list means allow all IPs',
     saveSuccess: 'Remote control settings saved',
-    accessInfo: 'Remote control access address:',
+    accessInfo: 'Remote control access address:'
+  },
+  cookie: {
+    title: 'Cookie Settings',
+    description: 'Please enter NetEase Cloud Music Cookie:',
+    placeholder: 'Please paste the complete Cookie...',
+    help: {
+      format: 'Cookie usually starts with "MUSIC_U="',
+      source: 'Can be obtained from browser developer tools network requests',
+      storage: 'Cookie will be automatically saved to local storage after setting'
+    },
+    action: {
+      save: 'Save Cookie',
+      paste: 'Paste',
+      clear: 'Clear'
+    },
+    validation: {
+      required: 'Please enter Cookie',
+      format: 'Cookie format may be incorrect, please check if it contains MUSIC_U'
+    },
+    message: {
+      saveSuccess: 'Cookie saved successfully',
+      saveError: 'Failed to save Cookie',
+      pasteSuccess: 'Pasted successfully',
+      pasteError: 'Paste failed, please copy manually'
+    },
+    info: {
+      length: 'Current length: {length} characters'
+    }
   }
 };

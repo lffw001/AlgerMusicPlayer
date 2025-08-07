@@ -38,19 +38,21 @@ let appShortcuts: ShortcutsConfig = {};
  */
 export async function handleShortcutAction(action: string) {
   const now = Date.now();
-  
+
   // 如果存在未完成的动作，则忽略当前请求
   if (actionTimeout) {
     console.log('[AppShortcuts] 忽略快速连续的动作请求:', action);
     return;
   }
-  
+
   // 检查是否是同一个动作的重复触发（300ms内）
   if (lastActionInfo.action === action && now - lastActionInfo.timestamp < ACTION_DELAY) {
-    console.log(`[AppShortcuts] 忽略重复的 ${action} 动作，距上次仅 ${now - lastActionInfo.timestamp}ms`);
+    console.log(
+      `[AppShortcuts] 忽略重复的 ${action} 动作，距上次仅 ${now - lastActionInfo.timestamp}ms`
+    );
     return;
   }
-  
+
   // 更新最后一次操作信息
   lastActionInfo = {
     action,
@@ -94,11 +96,8 @@ export async function handleShortcutAction(action: string) {
         showToast(t('player.playBar.next'), 'ri-skip-forward-line');
         break;
       case 'volumeUp':
-        // 从localStorage获取当前音量
-        const currentVolumeUp = parseFloat(localStorage.getItem('volume') || '1');
-        if (currentVolumeUp < 1) {
-          const newVolume = Math.min(1, currentVolumeUp + 0.1);
-          await audioService.setVolume(newVolume);
+        if (playerStore.getVolume() < 1) {
+          const newVolume = playerStore.increaseVolume(0.1);
           showToast(
             `${t('player.playBar.volume')}${Math.round(newVolume * 100)}%`,
             'ri-volume-up-line'
@@ -106,11 +105,8 @@ export async function handleShortcutAction(action: string) {
         }
         break;
       case 'volumeDown':
-        // 从localStorage获取当前音量
-        const currentVolumeDown = parseFloat(localStorage.getItem('volume') || '1');
-        if (currentVolumeDown > 0) {
-          const newVolume = Math.max(0, currentVolumeDown - 0.1);
-          await audioService.setVolume(newVolume);
+        if (playerStore.getVolume() > 0) {
+          const newVolume = playerStore.decreaseVolume(0.1);
           showToast(
             `${t('player.playBar.volume')}${Math.round(newVolume * 100)}%`,
             'ri-volume-down-line'
@@ -146,7 +142,9 @@ export async function handleShortcutAction(action: string) {
     // 确保在出错时也能清除超时
     clearTimeout(actionTimeout);
     actionTimeout = null;
-    console.log(`[AppShortcuts] 动作完成: ${action}, 时间戳: ${Date.now()}, 耗时: ${Date.now() - now}ms`);
+    console.log(
+      `[AppShortcuts] 动作完成: ${action}, 时间戳: ${Date.now()}, 耗时: ${Date.now() - now}ms`
+    );
   }
 }
 

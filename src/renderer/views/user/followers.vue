@@ -7,7 +7,7 @@
       <div class="page-title" v-else>
         {{ t('user.follower.myFollowersTitle') }}
       </div>
-      
+
       <n-spin v-if="followerListLoading && followerList.length === 0" size="large" />
       <n-scrollbar v-else class="scrollbar-container">
         <div v-if="followerList.length === 0" class="empty-follower">
@@ -69,12 +69,13 @@
 import { useMessage } from 'naive-ui';
 import { computed, onMounted, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
-import { useRouter, useRoute } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 
 import { getUserFollowers } from '@/api/user';
 import { useUserStore } from '@/store/modules/user';
-import type { IUserFollow } from '@/type/user';
+import type { IUserFollow } from '@/types/user';
 import { getImgUrl, setAnimationClass, setAnimationDelay } from '@/utils';
+import { checkLoginStatus as checkAuthStatus } from '@/utils/auth';
 
 defineOptions({
   name: 'UserFollowers'
@@ -101,30 +102,29 @@ const user = computed(() => userStore.user);
 const checkTargetUser = () => {
   const uid = route.query.uid;
   const name = route.query.name;
-  
+
   if (uid && typeof uid === 'string') {
     targetUserId.value = parseInt(uid);
     targetUserName.value = typeof name === 'string' ? name : '';
     return true;
   }
-  
+
   // 如果没有指定用户ID，则显示当前登录用户的粉丝列表
   return checkLoginStatus();
 };
 
 // 检查登录状态
 const checkLoginStatus = () => {
-  const token = localStorage.getItem('token');
-  const userData = localStorage.getItem('user');
+  const loginInfo = checkAuthStatus();
 
-  if (!token || !userData) {
+  if (!loginInfo.isLoggedIn) {
     router.push('/login');
     return false;
   }
 
   // 如果store中没有用户数据，但localStorage中有，则恢复用户数据
-  if (!userStore.user && userData) {
-    userStore.setUser(JSON.parse(userData));
+  if (!userStore.user && loginInfo.user) {
+    userStore.setUser(loginInfo.user);
   }
 
   return true;
@@ -133,17 +133,13 @@ const checkLoginStatus = () => {
 // 加载粉丝列表
 const loadFollowerList = async () => {
   // 确定要加载哪个用户的粉丝列表
-  const userId = targetUserId.value || (user.value?.userId);
-  
+  const userId = targetUserId.value || user.value?.userId;
+
   if (!userId) return;
 
   try {
     followerListLoading.value = true;
-    const { data } = await getUserFollowers(
-      userId,
-      followerLimit.value,
-      followerOffset.value
-    );
+    const { data } = await getUserFollowers(userId, followerLimit.value, followerOffset.value);
 
     if (!data || !data.followeds) {
       hasMoreFollowers.value = false;
@@ -191,14 +187,17 @@ onMounted(() => {
 });
 
 // 监听路由变化重新加载数据
-watch(() => route.query, (newQuery) => {
-  if (newQuery.uid && newQuery.uid !== targetUserId.value?.toString()) {
-    followerList.value = []; // 清空列表
-    followerOffset.value = 0; // 重置偏移量
-    checkTargetUser();
-    loadFollowerList();
+watch(
+  () => route.query,
+  (newQuery) => {
+    if (newQuery.uid && newQuery.uid !== targetUserId.value?.toString()) {
+      followerList.value = []; // 清空列表
+      followerOffset.value = 0; // 重置偏移量
+      checkTargetUser();
+      loadFollowerList();
+    }
   }
-});
+);
 </script>
 
 <style lang="scss" scoped>
